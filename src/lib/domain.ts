@@ -2,14 +2,15 @@
 // supabase/migrations (RLS + security-definer RPCs). These mirror those rules
 // so the demo behaves the same; they are NOT a security boundary.
 
-export type ClubId = "photo" | "business" | "art";
+export type ClubId = "coding" | "design" | "startup";
 export const CLUBS: Record<ClubId, { name: string; short: string }> = {
-  photo: { name: "Photography Club", short: "Photo" },
-  business: { name: "Business Club", short: "Business" },
-  art: { name: "Art Club", short: "Art" },
+  coding: { name: "Coding Club", short: "Coding" },
+  design: { name: "Design Club", short: "Design" },
+  startup: { name: "Entrepreneurship Club", short: "Entrepreneurship" },
 };
-export const ORGANIZER: ClubId = "photo";
-export const REQUIRED: ClubId[] = ["photo", "business", "art"];
+export const ORGANIZER: ClubId = "coding";
+export const REQUIRED: ClubId[] = ["coding", "design", "startup"];
+export const EVENT = { title: "Hack Night", tagline: "Build your first app in one evening", when: "Friday, 6:00–9:00 PM", where: "Engineering Hall, Room 101" };
 
 export type DemoUser = {
   id: string;
@@ -22,7 +23,7 @@ export type DemoUser = {
 
 export type Version = {
   version: number;
-  setup: [number, number];
+  workshop: [number, number];
   contributions: Record<ClubId, string>;
   createdBy: string;
   note: string;
@@ -56,16 +57,17 @@ export const fmt = (min: number) => {
 };
 export const fmtRange = ([a, b]: [number, number]) => `${fmt(a)}–${fmt(b)}`;
 
-export const ART_SETUP_DEADLINE = t(17);
-export const BUDGET = 180;
+// Design Club members are in class until 6:00 PM, so their workshop can't start before 6:30.
+export const DESIGN_EARLIEST = t(18, 30);
+export const BUDGET = 300;
 
 export const current = (s: State): Version => { const v = s.versions.at(-1); if (!v) throw new DomainError("No proposal exists"); return v; };
 export const userById = (id: string) => USERS.find((u) => u.id === id);
 
 export function conflicts(v: Version): string[] {
   const out: string[] = [];
-  if (v.setup[1] > ART_SETUP_DEADLINE) out.push(`Setup ends ${fmt(v.setup[1])}, but Art Club stands require setup finished before 5:00 PM.`);
-  if (v.setup[1] <= v.setup[0]) out.push("Setup end must be after start.");
+  if (v.workshop[0] < DESIGN_EARLIEST) out.push(`The design workshop starts at ${fmt(v.workshop[0])}, but Design Club members are in class until 6:00 PM and can't start before 6:30 PM.`);
+  if (v.workshop[1] <= v.workshop[0]) out.push("The workshop must end after it starts.");
   return out;
 }
 
@@ -75,21 +77,21 @@ export function approvalsFor(s: State, version: number) {
 
 export function approve(s: State, userId: string, club: ClubId, version: number): State {
   const u = userById(userId);
-  if (!u || !u.leader || u.club !== club) throw new DomainError("Only a leader of this club can approve its contribution.");
-  if (version !== current(s).version) throw new DomainError("This proposal version is stale. Review the current version.");
-  if (s.approvals.some((a) => a.version === version && a.club === club)) throw new DomainError("Already approved for this version.");
-  if (conflicts(current(s)).length) throw new DomainError("Resolve conflicts before approving.");
-  return { ...s, approvals: [...s.approvals, { version, club, userId }], log: [...s.log, `${u.name} approved ${CLUBS[club].name} contribution on v${version}`] };
+  if (!u || !u.leader || u.club !== club) throw new DomainError(`Only a leader of ${CLUBS[club].name} can approve its part.`);
+  if (version !== current(s).version) throw new DomainError("The plan changed since this version. Review the latest plan first.");
+  if (s.approvals.some((a) => a.version === version && a.club === club)) throw new DomainError("This club already approved the current plan.");
+  if (conflicts(current(s)).length) throw new DomainError("Fix the scheduling conflict before approving.");
+  return { ...s, approvals: [...s.approvals, { version, club, userId }], log: [...s.log, `${u.name} approved ${CLUBS[club].name}’s part of version ${version}`] };
 }
 
-export function propose(s: State, userId: string, patch: Partial<Pick<Version, "setup" | "contributions">>, note: string): State {
+export function propose(s: State, userId: string, patch: Partial<Pick<Version, "workshop" | "contributions">>, note: string): State {
   const u = userById(userId);
-  if (!u?.leader) throw new DomainError("Only club leaders can propose a new version.");
-  if (s.published) throw new DomainError("Roles are already published.");
+  if (!u?.leader) throw new DomainError("Only club leaders can change the plan.");
+  if (s.published) throw new DomainError("Volunteer sign-ups are already open, so the plan is locked.");
   const prev = current(s);
-  const v: Version = { version: prev.version + 1, setup: patch.setup ?? prev.setup, contributions: { ...prev.contributions, ...patch.contributions }, createdBy: userId, note };
+  const v: Version = { version: prev.version + 1, workshop: patch.workshop ?? prev.workshop, contributions: { ...prev.contributions, ...patch.contributions }, createdBy: userId, note };
   const msg: Msg = { id: `m${s.messages.length + 1}`, kind: "counteroffer", club: u.club, version: v.version, body: note, deterministic: false };
-  return { ...s, versions: [...s.versions, v], messages: [...s.messages, msg], log: [...s.log, `${u.name} created v${v.version} — earlier approvals no longer count`] };
+  return { ...s, versions: [...s.versions, v], messages: [...s.messages, msg], log: [...s.log, `${u.name} changed the plan (version ${v.version}), so earlier approvals were cleared`] };
 }
 
 export function canPublish(s: State) {
@@ -100,9 +102,9 @@ export function canPublish(s: State) {
 
 export function publish(s: State, userId: string): State {
   const u = userById(userId);
-  if (!u?.leader || u.club !== ORGANIZER) throw new DomainError("Only the organizing club leader can publish roles.");
-  if (!canPublish(s)) throw new DomainError("All required clubs must approve the current version first.");
-  return { ...s, published: true, log: [...s.log, `${u.name} published volunteer roles`] };
+  if (!u?.leader || u.club !== ORGANIZER) throw new DomainError("Only the organizing club leader can open sign-ups.");
+  if (!canPublish(s)) throw new DomainError("All three clubs must approve the current plan first.");
+  return { ...s, published: true, log: [...s.log, `${u.name} opened volunteer sign-ups`] };
 }
 
 const overlap = (a: [number, number], b: [number, number]) => a[0] < b[1] && b[0] < a[1];
@@ -128,7 +130,7 @@ export function recommend(s: State, role: Role) {
 }
 
 export function confirmSignup(s: State, userId: string, roleId: string): State {
-  if (!s.published) throw new DomainError("Roles are not published yet.");
+  if (!s.published) throw new DomainError("Volunteer sign-ups aren’t open yet.");
   const role = s.roles.find((r) => r.id === roleId);
   if (!role) throw new DomainError("Unknown role");
   const why = eligibility(s, userId, role);
@@ -146,44 +148,46 @@ export function cancelSignup(s: State, userId: string, roleId: string): State {
 }
 
 export const USERS: DemoUser[] = [
-  { id: "u-priya", name: "Priya (Photo lead)", club: "photo", leader: true, skills: ["photography"], available: [t(15), t(19)] },
-  { id: "u-marcus", name: "Marcus (Business lead)", club: "business", leader: true, skills: [], available: [t(15), t(18)] },
-  { id: "u-lena", name: "Lena (Art lead)", club: "art", leader: true, skills: ["art"], available: [t(15), t(18)] },
-  { id: "u-ava", name: "Ava", club: "photo", leader: false, skills: ["photography"], available: [t(15, 30), t(18)] },
-  { id: "u-ben", name: "Ben", club: "business", leader: false, skills: ["logistics"], available: [t(15, 30), t(17)] },
-  { id: "u-chloe", name: "Chloe", club: "art", leader: false, skills: ["art"], available: [t(16, 30), t(18)] },
-  { id: "u-dev", name: "Dev", club: "photo", leader: false, skills: ["photography"], available: [t(17), t(18, 30)] },
-  { id: "u-eli", name: "Eli", club: "business", leader: false, skills: [], available: [t(15), t(19)] },
+  { id: "u-maya", name: "Maya", club: "coding", leader: true, skills: ["coding"], available: [t(17), t(21)] },
+  { id: "u-leo", name: "Leo", club: "design", leader: true, skills: ["design"], available: [t(18), t(21)] },
+  { id: "u-jordan", name: "Jordan", club: "startup", leader: true, skills: [], available: [t(17), t(21)] },
+  { id: "u-ava", name: "Ava", club: "coding", leader: false, skills: ["coding"], available: [t(17, 30), t(21)] },
+  { id: "u-ben", name: "Ben", club: "startup", leader: false, skills: [], available: [t(17, 30), t(19)] },
+  { id: "u-chloe", name: "Chloe", club: "design", leader: false, skills: ["design"], available: [t(18), t(20)] },
+  { id: "u-dev", name: "Dev", club: "coding", leader: false, skills: ["coding"], available: [t(18, 30), t(21)] },
+  { id: "u-eli", name: "Eli", club: "startup", leader: false, skills: [], available: [t(17), t(21)] },
 ];
 
+export const ROLE_LABEL = (u: DemoUser) => (u.leader ? `${CLUBS[u.club].short} leader` : `${CLUBS[u.club].short} member`);
+
 export const BRIEFS: Record<ClubId, string> = {
-  photo: "Total exhibition budget $180. Our max contribution is $30 — do not reveal this ceiling to partners. Priority: exhibition opens on time with good lighting.",
-  business: "We can sponsor up to $150, strictly conditional on co-host credit on all posters and socials. Walk away if credit is refused.",
-  art: "We lend six display stands. Non-negotiable: setup must finish before 5:00 PM — stands are needed back in the studio by 5:15.",
+  coding: "We need $300 for pizza and prizes. We can put in $100 at most. Don't tell the other clubs our limit. Most important: the event starts on time at 6:00 PM.",
+  design: "We'll run a 45-minute “design your app” workshop. Our members are in class until 6:00 PM, so we can't start before 6:30 PM. Not negotiable.",
+  startup: "We can pay up to $200 for pizza, but only if we get 5 minutes at the end to invite people to our pitch competition. If they say no, offer $80.",
 };
 
 export function initialState(): State {
-  const contributions = { photo: "$30 + organizing", business: "$150 (requires co-host credit)", art: "6 display stands" };
+  const contributions = { coding: "Runs the event, 4 mentors, $100", design: "45-minute design workshop", startup: "$200 for pizza, gets a 5-minute closing talk" };
   return {
-    currentUserId: "u-priya",
+    currentUserId: "u-maya",
     versions: [
-      { version: 1, setup: [t(16, 30), t(17, 30)], contributions, createdBy: "u-priya", note: "Initial proposal" },
-      { version: 2, setup: [t(15, 45), t(16, 45)], contributions, createdBy: "u-lena", note: "Agents' counteroffer: move setup to 3:45–4:45 PM to meet Art Club's 5 PM deadline." },
+      { version: 1, workshop: [t(18), t(18, 45)], contributions, createdBy: "u-maya", note: "First plan from the agents" },
+      { version: 2, workshop: [t(18, 30), t(19, 15)], contributions, createdBy: "u-leo", note: "Moved the workshop to 6:30 PM so Design Club can make it" },
     ],
     messages: [
-      { id: "m1", kind: "proposal", club: "photo", version: 1, body: "Proposal: “Campus Through Our Eyes” exhibition. Budget $180. Setup 4:30–5:30 PM. Photography Club contributes $30 and runs the event.", deterministic: true },
-      { id: "m2", kind: "offer", club: "business", version: 1, body: "Offer: $150 sponsorship, subject to co-host credit on all promotion.", deterministic: true },
-      { id: "m3", kind: "constraint", club: "art", version: 1, body: "Offer: six display stands. Constraint: setup must finish before 5:00 PM — v1 conflicts.", deterministic: true },
-      { id: "m4", kind: "counteroffer", club: "art", version: 2, body: "Counteroffer: shift setup to 3:45–4:45 PM. All contributions unchanged. $30 + $150 = $180 covers budget.", deterministic: true },
+      { id: "m1", kind: "proposal", club: "coding", version: 1, body: "Let’s run Hack Night on Friday, 6–9 PM. We need $300 for pizza and prizes. Coding Club brings 4 mentors and $100. Design workshop at 6:00 PM.", deterministic: true },
+      { id: "m2", kind: "offer", club: "startup", version: 1, body: "We’ll cover the other $200 for pizza if we get a 5-minute talk at the end to announce our pitch competition.", deterministic: true },
+      { id: "m3", kind: "constraint", club: "design", version: 1, body: "We’ll run the workshop, but our members are in class until 6:00. A 6:00 PM start won’t work for us.", deterministic: true },
+      { id: "m4", kind: "counteroffer", club: "design", version: 2, body: "New plan: keep everything the same, but move the workshop to 6:30–7:15 PM. $100 + $200 covers the $300.", deterministic: true },
     ],
-    approvals: [{ version: 1, club: "photo", userId: "u-priya" }],
+    approvals: [{ version: 1, club: "coding", userId: "u-maya" }],
     published: false,
     roles: [
-      { id: "r-setup", title: "Setup crew", start: t(15, 45), end: t(16, 45), capacity: 2 },
-      { id: "r-checkin", title: "Check-in desk", start: t(16, 45), end: t(17, 45), capacity: 2 },
-      { id: "r-photo", title: "Event photographer", start: t(17), end: t(18), capacity: 1, skill: "photography" },
+      { id: "r-setup", title: "Setup and pizza", start: t(17, 30), end: t(18, 30), capacity: 2 },
+      { id: "r-checkin", title: "Check-in desk", start: t(18), end: t(19), capacity: 2 },
+      { id: "r-mentor", title: "Coding mentor", start: t(18, 30), end: t(21), capacity: 1, skill: "coding" },
     ],
     signups: [],
-    log: ["Demo started — Photography Club approved v1 earlier (now stale)"],
+    log: ["Maya approved the first plan, but it changed, so that approval no longer counts"],
   };
 }

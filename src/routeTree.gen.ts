@@ -19,8 +19,6 @@ import { Route as DemoIndexRouteImport } from './routes/demo.index'
 import { Route as DemoApprovalsRouteImport } from './routes/demo.approvals'
 import { Route as DemoBriefRouteImport } from './routes/demo.brief'
 import { Route as DemoCrewRouteImport } from './routes/demo.crew'
-import { Route as DemoEventRouteImport } from './routes/demo.event'
-import { Route as DemoSetupRouteImport } from './routes/demo.setup'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -72,16 +70,6 @@ const DemoCrewRoute = DemoCrewRouteImport.update({
   path: '/crew',
   getParentRoute: () => DemoRoute,
 } as any)
-const DemoEventRoute = DemoEventRouteImport.update({
-  id: '/event',
-  path: '/event',
-  getParentRoute: () => DemoRoute,
-} as any)
-const DemoSetupRoute = DemoSetupRouteImport.update({
-  id: '/setup',
-  path: '/setup',
-  getParentRoute: () => DemoRoute,
-} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -93,8 +81,6 @@ export interface FileRoutesByFullPath {
   '/demo/approvals': typeof DemoApprovalsRoute
   '/demo/brief': typeof DemoBriefRoute
   '/demo/crew': typeof DemoCrewRoute
-  '/demo/event': typeof DemoEventRoute
-  '/demo/setup': typeof DemoSetupRoute
   '/demo/': typeof DemoIndexRoute
 }
 export interface FileRoutesByTo {
@@ -106,8 +92,6 @@ export interface FileRoutesByTo {
   '/demo/approvals': typeof DemoApprovalsRoute
   '/demo/brief': typeof DemoBriefRoute
   '/demo/crew': typeof DemoCrewRoute
-  '/demo/event': typeof DemoEventRoute
-  '/demo/setup': typeof DemoSetupRoute
   '/demo': typeof DemoIndexRoute
 }
 export interface FileRoutesById {
@@ -121,8 +105,6 @@ export interface FileRoutesById {
   '/demo/approvals': typeof DemoApprovalsRoute
   '/demo/brief': typeof DemoBriefRoute
   '/demo/crew': typeof DemoCrewRoute
-  '/demo/event': typeof DemoEventRoute
-  '/demo/setup': typeof DemoSetupRoute
   '/demo/': typeof DemoIndexRoute
 }
 export interface FileRouteTypes {
@@ -137,8 +119,6 @@ export interface FileRouteTypes {
     | '/demo/approvals'
     | '/demo/brief'
     | '/demo/crew'
-    | '/demo/event'
-    | '/demo/setup'
     | '/demo/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -150,8 +130,6 @@ export interface FileRouteTypes {
     | '/demo/approvals'
     | '/demo/brief'
     | '/demo/crew'
-    | '/demo/event'
-    | '/demo/setup'
     | '/demo'
   id:
     | '__root__'
@@ -164,8 +142,6 @@ export interface FileRouteTypes {
     | '/demo/approvals'
     | '/demo/brief'
     | '/demo/crew'
-    | '/demo/event'
-    | '/demo/setup'
     | '/demo/'
   fileRoutesById: FileRoutesById
 }
@@ -250,20 +226,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DemoCrewRouteImport
       parentRoute: typeof DemoRoute
     }
-    '/demo/event': {
-      id: '/demo/event'
-      path: '/event'
-      fullPath: '/demo/event'
-      preLoaderRoute: typeof DemoEventRouteImport
-      parentRoute: typeof DemoRoute
-    }
-    '/demo/setup': {
-      id: '/demo/setup'
-      path: '/setup'
-      fullPath: '/demo/setup'
-      preLoaderRoute: typeof DemoSetupRouteImport
-      parentRoute: typeof DemoRoute
-    }
   }
 }
 
@@ -271,8 +233,6 @@ interface DemoRouteChildren {
   DemoApprovalsRoute: typeof DemoApprovalsRoute
   DemoBriefRoute: typeof DemoBriefRoute
   DemoCrewRoute: typeof DemoCrewRoute
-  DemoEventRoute: typeof DemoEventRoute
-  DemoSetupRoute: typeof DemoSetupRoute
   DemoIndexRoute: typeof DemoIndexRoute
 }
 
@@ -280,8 +240,6 @@ const DemoRouteChildren: DemoRouteChildren = {
   DemoApprovalsRoute: DemoApprovalsRoute,
   DemoBriefRoute: DemoBriefRoute,
   DemoCrewRoute: DemoCrewRoute,
-  DemoEventRoute: DemoEventRoute,
-  DemoSetupRoute: DemoSetupRoute,
   DemoIndexRoute: DemoIndexRoute,
 }
 

@@ -1,5 +1,7 @@
 # CoHost — Neon Campus
 
+**Update (Oct 25):** imagery is the product itself (club cards, agent messages, the shared plan, volunteer shifts), not campus scenery. The running example everywhere is **Hack Night**, co-hosted by Coding Club (organizer), Design Club and Entrepreneurship Club. The demo is three numbered steps (Plan, Approve, Volunteers) with a person switcher; the live workspace mirrors that order and leads with a "What to do next" card. Plain, literal copy over slogans. Sections below about night scenes, booths and the photo exhibition are superseded.
+
 User-directed visual update: graphite and near-black surfaces, electric cyan actions, violet collaboration accents, luminous campus scenery. All screens use the shared dark semantic tokens in src/styles.css. Maintain readable contrast, reduced-motion support, responsive layouts, and existing auth and database behavior.
 
 # CoHost design system — "Campus after dark"
