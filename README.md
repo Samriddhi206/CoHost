@@ -2,6 +2,10 @@
 
 One club’s idea. A whole campus behind it.
 
+[![Watch the CoHost demo video (80 seconds)](docs/demo-thumbnail.jpg)](docs/demo.mp4)
+
+▶️ **[Watch the 80-second demo](docs/demo.mp4)**: Hack Night goes from the plan to the approvals to the volunteers. Try it yourself at [cohost-redesign.vercel.app/demo](https://cohost-redesign.vercel.app/demo), no account needed.
+
 The project started in Lovable and is now a standalone TanStack Start app deployed on Vercel.
 
 ## Run locally
