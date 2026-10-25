@@ -2,6 +2,8 @@
 
 **One club’s idea. A whole campus behind it.**
 
+**[Open the live app →](https://cohost-redesign.vercel.app/)** — use CoHost in your browser; no local setup required.
+
 CoHost helps campus organizations plan shared events, coordinate resources, and recruit volunteers. Each club’s agent works within its club’s constraints to propose a shared plan. Club officers approve their own commitments, and students choose the volunteer shifts that fit their availability and skills.
 
 [![Watch the CoHost demo video (80 seconds)](docs/demo-thumbnail.jpg)](docs/demo.mp4)
