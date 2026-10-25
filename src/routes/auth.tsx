@@ -1,7 +1,9 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { z } from "zod";
-import { Brand, meta } from "@/components/Brand";
+import { Loader2 } from "lucide-react";
+import { meta } from "@/components/Brand";
+import { AuthShell } from "@/components/AuthShell";
 import { getSupabase, supabaseConfigured } from "@/lib/supabase";
 import { authErrorMessage } from "@/lib/auth-error";
 
@@ -57,20 +59,33 @@ export function Auth() {
       }
     } catch (err) { setMsg(authErrorMessage(err)); } finally { setBusy(false); }
   }
+  const copy = {
+    in: ["Welcome back", "Sign in to see your events, approvals and shifts."],
+    up: ["Create your account", "Use your campus email. We’ll send a link to confirm it."],
+    recover: ["Reset your password", "We’ll email you a secure link to choose a new one."],
+    resend: ["Resend confirmation", "Didn’t get the email? We’ll send another link."],
+  } as const;
   return (
-    <div className="mx-auto max-w-md px-6 py-12">
-      <Link to="/"><Brand /></Link>
-      <div className="mt-10">
-        {!supabaseConfigured ? <NotConfigured /> : (
-          <form className="panel space-y-4" onSubmit={submit}>
-            <div className="flex flex-wrap gap-2">{([["in", "Sign in"], ["up", "Sign up"], ["recover", "Forgot password"], ["resend", "Resend confirmation"]] as const).map(([k, l]) => <button type="button" key={k} onClick={() => { setMode(k); setMsg(null); }} className={`btn ${mode === k ? "btn-primary" : "btn-ghost"} px-3 py-1 text-xs`}>{l}</button>)}</div>
-            <label className="block text-sm font-medium">Email<input name="email" type="email" autoComplete="email" className="field mt-1" required maxLength={255} /></label>
-            {(mode === "in" || mode === "up") && <label className="block text-sm font-medium">Password<input name="password" type="password" autoComplete={mode === "up" ? "new-password" : "current-password"} className="field mt-1" required minLength={8} maxLength={72} /></label>}
-            <button className="btn btn-primary w-full" disabled={busy}>{mode === "in" ? "Sign in" : mode === "up" ? "Create account" : mode === "resend" ? "Resend confirmation" : "Send reset link"}</button>
-            {msg && <p role="status" className="text-sm text-muted-foreground">{msg}</p>}
-          </form>
-        )}
-      </div>
-    </div>
+    <AuthShell title={copy[mode][0]} lede={copy[mode][1]}>
+      {!supabaseConfigured ? <NotConfigured /> : (
+        <form className="space-y-5" onSubmit={submit} noValidate={false}>
+          <div role="group" aria-label="Account" className="grid grid-cols-2 gap-1 rounded-full border border-border bg-muted p-1">
+            {([["in", "Sign in"], ["up", "Sign up"]] as const).map(([k, l]) => (
+              <button type="button" key={k} aria-pressed={mode === k} onClick={() => { setMode(k); setMsg(null); }} className={`min-h-10 rounded-full text-sm font-semibold transition-all duration-200 ${mode === k ? "bg-card text-foreground shadow-[var(--shadow-soft)]" : "text-muted-foreground hover:text-foreground"}`}>{l}</button>
+            ))}
+          </div>
+          <label className="block text-sm font-medium">Email<input name="email" type="email" autoComplete="email" className="field mt-2" required maxLength={255} placeholder="you@university.edu" /></label>
+          {(mode === "in" || mode === "up") && <label className="block text-sm font-medium">Password<input name="password" type="password" autoComplete={mode === "up" ? "new-password" : "current-password"} className="field mt-2" required minLength={8} maxLength={72} /></label>}
+          {mode === "up" && <p className="-mt-2 text-xs text-muted-foreground">At least 8 characters.</p>}
+          <button className="btn btn-primary w-full py-3 text-base" disabled={busy}>{busy && <Loader2 size={16} className="animate-spin" aria-hidden="true" />}{mode === "in" ? "Sign in" : mode === "up" ? "Create account" : mode === "resend" ? "Resend confirmation" : "Send reset link"}</button>
+          {msg && <p role="status" className="rounded-xl border border-border bg-card px-4 py-3 text-sm leading-6 text-foreground">{msg}</p>}
+          <div className="flex flex-wrap items-center justify-between gap-2 border-t border-border pt-5 text-sm">
+            {([["recover", "Forgot password"], ["resend", "Resend confirmation"]] as const).map(([k, l]) => (
+              <button type="button" key={k} aria-pressed={mode === k} onClick={() => { setMode(k); setMsg(null); }} className={`min-h-10 rounded-full px-2 font-medium underline-offset-4 transition-colors hover:underline ${mode === k ? "text-primary" : "text-muted-foreground hover:text-foreground"}`}>{l}</button>
+            ))}
+          </div>
+        </form>
+      )}
+    </AuthShell>
   );
 }
