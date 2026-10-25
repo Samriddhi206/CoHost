@@ -1,7 +1,7 @@
 import { createContext, useContext, useState, type ReactNode } from "react";
-import { DomainError, initialState, type State } from "./domain";
+import { DomainError, EVENTS, eventsFor, initialState, userById, type EventId, type State } from "./domain";
 
-type Ctx = { s: State; run: (fn: (s: State) => State) => void; error: string | null; clear: () => void; reset: () => void; setUser: (id: string) => void };
+type Ctx = { s: State; run: (fn: (s: State) => State) => void; error: string | null; clear: () => void; reset: () => void; setUser: (id: string) => void; setEvent: (id: EventId) => void };
 const C = createContext<Ctx | null>(null);
 
 // Isolated in-memory demo state. The account switcher only changes this
@@ -18,7 +18,12 @@ export function DemoProvider({ children }: { children: ReactNode }) {
     }
   };
   return (
-    <C.Provider value={{ s, run, error, clear: () => setError(null), reset: () => { setS(initialState()); setError(null); }, setUser: (id) => setS({ ...s, currentUserId: id }) }}>
+    <C.Provider value={{ s, run, error, clear: () => setError(null), reset: () => { setS(initialState()); setError(null); }, setUser: (id) => {
+      // Stay on the current event if this person is part of it, otherwise open their first event.
+      const mine = eventsFor(userById(id)!);
+      const eventId = mine.some((e) => e.id === s.currentEventId) ? s.currentEventId : (mine[0]?.id ?? s.currentEventId);
+      setS({ ...s, currentUserId: id, currentEventId: eventId });
+    }, setEvent: (id) => { if (EVENTS[id]) setS({ ...s, currentEventId: id }); } }}>
       {children}
     </C.Provider>
   );
