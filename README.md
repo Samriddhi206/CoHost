@@ -2,7 +2,7 @@
 
 One club’s idea. A whole campus behind it.
 
-Lovable generated the initial design and demo; the live frontend and database enforcement were completed directly after Lovable's credit limit.
+The project started in Lovable and is now a standalone TanStack Start app deployed on Vercel.
 
 ## Run locally
 
