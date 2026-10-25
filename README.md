@@ -10,6 +10,18 @@ CoHost helps campus organizations plan shared events, coordinate resources, and 
 
 ▶️ **[Watch the 80-second demo](docs/demo.mp4)**: Hack Night goes from the plan to the approvals to the volunteers. Try it yourself at [cohost-redesign.vercel.app/demo](https://cohost-redesign.vercel.app/demo), no account needed.
 
+Built for the [Cubbie Hackathon](https://hackathon.cubbie.ai), Track 3 (Group Chat Assistant).
+
+## Track 3 at a glance
+
+| Track 3 asks | CoHost |
+| --- | --- |
+| An AI that joins a group and makes it more useful | Each club brings an agent into a shared event workspace with its partner clubs. The agents turn each club's private limits into one plan, and the officers of every club in the event can read each message they exchange. CoHost is a web app, not a plug-in for a messaging app |
+| Something students would want to invite in | Officers type their limits once in a private brief; the agent drafts the plan, catches conflicts and explains what changed. Members never sit through the back-and-forth: they just pick a shift |
+| Tied to real campus life | Club events that need several organizations: funding split across clubs, members still in class, setup deadlines, volunteer shifts that fit each student's time and skills |
+| A working prototype on a real scenario | Live at [cohost-redesign.vercel.app](https://cohost-redesign.vercel.app/) with Supabase accounts, plus a no-account [Hack Night demo](https://cohost-redesign.vercel.app/demo) |
+| Conflicting constraints, what is shared, when people confirm | Briefs stay with their club's officers; only offers, conditions and timing are shared. Agents keep contributions within each club's saved limit and schedule setup around its deadline; in the demo, a workshop set while Design Club is still in class is flagged and fixed in version 2. Agents never commit a club: each club's officers approve their own part of the current version, and any change voids earlier approvals |
+
 ## Overview
 
 Campus events often depend on resources spread across several organizations: one club has the idea, another has funding, and another has the people or equipment. CoHost brings these contributions into a shared workflow with clear responsibilities and explicit approval.

@@ -78,7 +78,7 @@ Color is never the only signal: every status badge carries a word ("Approved", "
    column steps through: private briefs → first proposal → conflict (Art Club needs setup done by
    5:00 PM) → counteroffer v2 → leaders approve → organizer publishes → students confirm. Right
    column shows the agent messages and the agreement card updating in step. A progress rail shows
-   the step. This section answers the Track 2 judging questions directly.
+   the step. This section answers the Track 3 judging questions directly.
 5. **Private vs shared**: two cards side by side. Private brief (locked, blurred text) vs. what the
    agents actually share (contributions, timing). Cards tilt slightly toward the cursor.
 6. **Guarantees bento**: versioned agreements, leader-owned approvals, fair crews, enforced in
