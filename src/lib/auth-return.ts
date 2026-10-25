@@ -12,6 +12,7 @@ let pending:Promise<AuthReturn>|undefined;
 export function finishAuthReturn():Promise<AuthReturn>{
  if(pending)return pending;
  const code=readAuthCode(window.location.href);
+ const flowId=new URL(window.location.href).searchParams.get('sb_flow_id');
  window.history.replaceState(window.history.state,'',window.location.pathname);
  const sb=getSupabase();
  pending=(async()=>{
@@ -19,7 +20,8 @@ export function finishAuthReturn():Promise<AuthReturn>{
   let recovery=false;
   const {data:listener}=sb.auth.onAuthStateChange(event=>{if(event==='PASSWORD_RECOVERY')recovery=true});
   try{
-   const {data,error}=await sb.auth.exchangeCodeForSession(code);
+   // Preserve Supabase's per-flow verifier selector before sanitizing browser history.
+   const {data,error}=await sb.auth.exchangeCodeForSession(code,flowId?{flowId}:undefined);
    if(error||!data.session)return {ok:false,message:invalid} as const;
    const verified=await sb.auth.getUser();
    if(verified.error||!verified.data.user?.email_confirmed_at)return {ok:false,message:'Your email could not be verified. Please request a new confirmation link.'} as const;
