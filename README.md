@@ -1,59 +1,121 @@
 # CoHost
 
-One club’s idea. A whole campus behind it.
+**One club’s idea. A whole campus behind it.**
+
+CoHost helps campus organizations plan shared events, coordinate resources, and recruit volunteers. Each club’s agent works within its club’s constraints to propose a shared plan. Club officers approve their own commitments, and students choose the volunteer shifts that fit their availability and skills.
 
 [![Watch the CoHost demo video (80 seconds)](docs/demo-thumbnail.jpg)](docs/demo.mp4)
 
 ▶️ **[Watch the 80-second demo](docs/demo.mp4)**: Hack Night goes from the plan to the approvals to the volunteers. Try it yourself at [cohost-redesign.vercel.app/demo](https://cohost-redesign.vercel.app/demo), no account needed.
 
-The project started in Lovable and is now a standalone TanStack Start app deployed on Vercel.
+## Overview
 
-## Run locally
+Campus events often depend on resources spread across several organizations: one club has the idea, another has funding, and another has the people or equipment. CoHost brings these contributions into a shared workflow with clear responsibilities and explicit approval.
 
-Node 24+ and npm:
+The Hack Night demo follows three clubs through a scheduling conflict, a revised agreement, officer approvals, and volunteer recruitment.
+
+## Core features
+
+- **Agent coordination:** Rules-based agents propose funding allocations and scheduling adjustments using each club’s saved constraints.
+- **Private club briefs:** Officers define contribution limits, deadlines, and internal priorities. Private notes remain accessible to their club’s officers.
+- **Versioned approvals:** Each club approves its own commitment to the current plan. Changes require renewed approval.
+- **Volunteer recruitment:** Organizers publish shifts after the required approvals. Students confirm or cancel their own eligible shifts.
+- **Role-based access:** Club roles distinguish members from officers and control access to planning and approval workflows.
+
+The interactive demo uses isolated, in-memory state and simulated account switching. It provides a guided example without creating live accounts or granting access to production data.
+
+## Technology
+
+CoHost is a standalone TanStack Start application built with React and TypeScript. Supabase provides authentication and PostgreSQL storage; Vercel hosts the application.
+
+## Local development
+
+### Requirements
+
+- Node.js 24 or later
+- npm
+- A configured Supabase project for live account and database features
+
+### Setup
 
 ```sh
 npm ci --ignore-scripts
 cp .env.example .env.local
+```
+
+Set these public client configuration values in `.env.local`:
+
+```dotenv
+VITE_SUPABASE_URL=https://your-project.supabase.co
+VITE_SUPABASE_PUBLISHABLE_KEY=your-publishable-key
+```
+
+Use a publishable key for browser configuration. Keep service-role keys and other server credentials out of `VITE_*` variables and version control.
+
+Start the development server:
+
+```sh
 npm run dev -- --host 127.0.0.1 --port 4173
 ```
 
-Set `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY` in `.env.local`. These are public browser configuration, never a service-role key. The separate CoHost backend is project `coyvvzgprivwcbltqdiq`.
+## Using CoHost
 
-## Live flow
+1. **Create an account.** Register at `/auth` and confirm your email. The live workspace at `/app` requires Supabase authentication.
+2. **Create or join a club.** Members can join directly; requested officer roles require confirmation by an existing officer.
+3. **Start an event.** Create the event and invite partner clubs before the first proposal.
+4. **Define club constraints.** Each club’s officers save a private brief, contribution limit, and any relevant setup deadline.
+5. **Coordinate a plan.** Agents propose contributions and timing within the saved limits. Insufficient funding prevents a proposal from proceeding.
+6. **Collect approvals.** Each participating club approves its own commitment to the current version.
+7. **Recruit volunteers.** The organizer adds shifts and opens sign-ups after all required approvals. Students save their availability and skills, then choose eligible shifts.
 
-1. Create an account at `/auth` and confirm your email. `/app` requires real Supabase authentication.
-2. In Clubs & people, create your club and event. Other leaders use their own accounts to create partner clubs.
-3. Invite partner clubs before the first proposal. Each leader saves their own private brief, contribution limit, and optional setup deadline in My agent.
-4. Coordinate a proposal in Event workspace. Bounded rules-based agents allocate funding and move setup earlier to fit partner deadlines. Insufficient funding blocks negotiation. Private notes are not shared.
-5. Each club leader approves their own current-version commitment. New proposals or brief changes invalidate prior approvals.
-6. Organizer adds volunteer roles and publishes only after every required leader approves.
-7. Students request club membership; leaders approve requests. Students save availability and self-reported skills, then explicitly confirm or cancel eligible shifts.
-8. Refresh to see other accounts' changes. Cancelled roles reopen; eligible students see recommendations without automatic enrollment.
+Refresh the workspace to view other users’ changes. Cancelled shifts reopen for eligible students; recommendations do not enroll anyone automatically.
 
-`/demo` is isolated in-memory state with simulated account switching. It does not grant access to live accounts or data.
+## Backend and access control
 
-## Backend and security
+Authorization is enforced in PostgreSQL using Supabase Auth identities and row-level security. Client table access is SELECT-only. Writes pass through authenticated invoker wrappers that call checked functions in a private schema.
 
-Supabase Auth + Postgres RLS. Browser tables are SELECT-only; writes use authenticated invoker wrappers around checked functions in an unexposed private schema. Function identity comes from `auth.uid()`. The database enforces club roles, current approvals, private brief isolation, organizer-only publication, skill/availability matching, shift capacity, and overlap checks. Privileged implementations never accept client identity as authorization.
+The database enforces club permissions, private brief access, current-version approvals, organizer-only publication, volunteer eligibility, shift capacity, and overlapping-shift restrictions. Authorization uses `auth.uid()` rather than a client-supplied identity. Funding commitments represent pledges; CoHost does not process payments.
 
-SQL replay order on an EMPTY project: `db/migrations/20261025000000_cohost_init.sql`, `db/hardening.sql`, `db/workflows.sql`, `db/private-api.sql`. These changes are already applied on CoHost. Do not re-run against an initialized project.
+### Database setup
 
-Then apply `db/migrations/20261025060000_club_roles.sql` once. It adds club roles (President, Vice President, Budget officer, Event coordinator, Member; anyone above Member is an officer), display names, event time and place, joining a club with a requested role that an officer confirms, and hides the plan, agent messages and approvals from plain members. Then `db/migrations/20261025070000_instant_join.sql`, which lets people join a club as a Member instantly (officer roles still need an officer). `db/tests/club-roles.sql` checks those rules and rolls everything back.
+For a new, empty Supabase project, apply the SQL files in this order:
 
-## Verification
+1. `db/migrations/20261025000000_cohost_init.sql`
+2. `db/hardening.sql`
+3. `db/workflows.sql`
+4. `db/private-api.sql`
+5. `db/migrations/20261025060000_club_roles.sql`
+6. `db/migrations/20261025070000_instant_join.sql`
+
+The club-role migration adds officer roles, display names, event details, and restricted access to plans, agent messages, and approvals. The instant-join migration enables direct membership while retaining officer approval for elevated roles.
+
+Apply each migration once. Do not replay the initialization files against an existing CoHost database.
+
+## Validation
 
 ```sh
-npx tsc --noEmit
+npm run typecheck
 npm test
 npm run build
 npm audit
 ```
 
-`db/tests/live-security.sql` runs 34 pgTAP assertions with transactional fixtures and rolls everything back. Run with a privileged SQL session against a test project; assertions switch to anon/authenticated roles. `VERIFICATION.md` records results and limits.
+Additional database checks:
 
-## Vercel
+- `db/tests/live-security.sql` contains 34 pgTAP assertions using transactional fixtures and rolls back its changes.
+- `db/tests/club-roles.sql` checks club-role permissions and rolls back its changes.
+- `VERIFICATION.md` records verification results and known limitations.
 
-Import `Samriddhi206/cohost`, use `npm ci --ignore-scripts` and `npm run build`, and set the two public Supabase variables. Nitro's Vercel preset generates `.vercel/output` including the server function; there is no SPA rewrite. Vercel access was not available during this build, so no production deployment is claimed.
+Run database checks in a test environment with a privileged SQL session; the assertions switch between anonymous and authenticated roles.
 
-Set Supabase Auth Site URL and redirect allowlist to the deployed origin and its `/reset-password` path. Do not use wildcard callback URLs. Keep email confirmation enabled. Real sign-in/email recovery and production headers still need verification on that origin.
+## Deployment
+
+Import `Samriddhi206/cohost` into Vercel and configure:
+
+- **Install command:** `npm ci --ignore-scripts`
+- **Build command:** `npm run build`
+- **Environment variables:** `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY`
+
+Nitro’s Vercel preset generates `.vercel/output`, including the server function. The application uses server routing rather than an SPA rewrite.
+
+In Supabase Auth, set the Site URL to the deployed origin and allow the exact `/auth/callback` and `/reset-password` URLs. Keep email confirmation enabled and configure an SMTP provider for confirmation and password-reset delivery to users outside the project team. Verify signup, confirmation, sign-in, and password recovery on the deployed application.
