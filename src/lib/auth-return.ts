@@ -17,7 +17,7 @@ export function finishAuthReturn():Promise<AuthReturn>{
  // Confirmation tokens in the fragment work across browsers and never reach server logs.
  const fragment=new URLSearchParams(url.hash.slice(1));
  const token=fragment.get('token_hash');
- const emailToken=url.pathname==='/auth/callback'&&fragment.get('type')==='email'&&token&&/^[a-f0-9]{40,128}$/i.test(token)&&!url.searchParams.has('error')&&!fragment.has('error')?token:null;
+ const emailToken=url.pathname==='/auth/callback'&&fragment.get('type')==='email'&&token&&/^(?:pkce_)?[a-f0-9]{40,128}$/i.test(token)&&!url.searchParams.has('error')&&!fragment.has('error')?token:null;
  window.history.replaceState(window.history.state,'',window.location.pathname);
  const sb=getSupabase();
  pending=(async()=>{
