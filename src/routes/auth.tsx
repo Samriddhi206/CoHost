@@ -3,6 +3,7 @@ import { useState } from "react";
 import { z } from "zod";
 import { Brand, meta } from "@/components/Brand";
 import { getSupabase, supabaseConfigured } from "@/lib/supabase";
+import { authErrorMessage } from "@/lib/auth-error";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({ meta: meta("Sign in — CoHost", "Sign in, create an account or recover your CoHost password.") }),
@@ -54,7 +55,7 @@ export function Auth() {
         if (error) throw error;
         setMsg("If that account exists, a reset link is on its way. Open it in this browser.");
       }
-    } catch (err) { setMsg(err instanceof Error ? err.message : "Something went wrong"); } finally { setBusy(false); }
+    } catch (err) { setMsg(authErrorMessage(err)); } finally { setBusy(false); }
   }
   return (
     <div className="mx-auto max-w-md px-6 py-12">
