@@ -126,7 +126,7 @@ function Hero() {
 
 function Word({ children, i, glow }: { children: string; i: number; glow?: boolean }) {
   // The gradient sits on each word: background-clip text breaks when a parent's children are transformed.
-  const tone = glow ? "bg-gradient-to-r from-flare via-[oklch(0.84_0.14_70)] to-[oklch(0.78_0.15_10)] bg-clip-text text-transparent [text-shadow:none]" : "";
+  const tone = glow ? "bg-gradient-to-r from-flare via-[oklch(0.82_0.12_245)] to-[oklch(0.74_0.18_290)] bg-clip-text text-transparent [text-shadow:none]" : "";
   return <span className={`anim-rise mr-[0.22em] inline-block pb-[0.06em] last:mr-0 ${tone}`} style={{ animationDelay: `${0.12 + i * 0.06}s`, animationDuration: ".9s" }}>{children}</span>;
 }
 

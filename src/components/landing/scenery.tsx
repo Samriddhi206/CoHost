@@ -31,11 +31,11 @@ export function Sky({ tone = "night" }: { tone?: "night" | "dusk" }) {
   return (
     <div aria-hidden="true" className="absolute inset-0 overflow-hidden">
       <div className="absolute inset-0" style={{ background: tone === "night"
-        ? "linear-gradient(180deg, oklch(0.16 0.03 284) 0%, oklch(0.22 0.07 290) 48%, oklch(0.36 0.12 330) 78%, oklch(0.58 0.16 40) 100%)"
-        : "linear-gradient(180deg, oklch(0.2 0.05 284) 0%, oklch(0.32 0.12 300) 45%, oklch(0.55 0.17 20) 80%, oklch(0.74 0.15 60) 100%)" }} />
+        ? "linear-gradient(180deg, oklch(0.12 0.018 265) 0%, oklch(0.19 0.045 270) 48%, oklch(0.28 0.09 290) 78%, oklch(0.38 0.08 215) 100%)"
+        : "linear-gradient(180deg, oklch(0.2 0.05 284) 0%, oklch(0.32 0.12 300) 45%, oklch(0.34 0.10 285) 80%, oklch(0.48 0.10 215) 100%)" }} />
       <div className="anim-aurora absolute -left-1/4 top-[8%] h-[55%] w-[80%] rounded-full opacity-50 blur-3xl" style={{ background: "radial-gradient(closest-side, oklch(0.6 0.2 285 / .7), transparent)" }} />
-      <div className="anim-aurora absolute -right-1/4 top-[22%] h-[50%] w-[70%] rounded-full opacity-40 blur-3xl" style={{ background: "radial-gradient(closest-side, oklch(0.7 0.18 350 / .6), transparent)", animationDelay: "-6s" }} />
-      <div className="absolute inset-x-0 bottom-0 h-[45%]" style={{ background: "radial-gradient(60% 80% at 50% 100%, oklch(0.75 0.17 50 / .55), transparent 70%)" }} />
+      <div className="anim-aurora absolute -right-1/4 top-[22%] h-[50%] w-[70%] rounded-full opacity-40 blur-3xl" style={{ background: "radial-gradient(closest-side, oklch(0.65 0.15 205 / .6), transparent)", animationDelay: "-6s" }} />
+      <div className="absolute inset-x-0 bottom-0 h-[45%]" style={{ background: "radial-gradient(60% 80% at 50% 100%, oklch(0.65 0.14 215 / .55), transparent 70%)" }} />
     </div>
   );
 }
@@ -64,7 +64,7 @@ export function FarSkyline({ fill = "oklch(0.27 0.07 292)" }: { fill?: string })
         {/* tree line */}
         {Array.from({ length: 26 }, (_, i) => <circle key={i} cx={i * 64 + 20} cy={base + 10 - (i % 3) * 14} r={34 + (i % 4) * 8} />)}
       </g>
-      <circle cx={1075} cy={base - 280} r={18} fill="oklch(0.86 0.12 80 / .9)" />
+      <circle cx={1075} cy={base - 280} r={18} fill="oklch(0.85 0.12 205 / .9)" />
     </svg>
   );
 }
@@ -89,7 +89,7 @@ export function NearBuildings({ seed = 5 }: { seed?: number }) {
               const lit = rand() > 0.55;
               const cx = b.x + 20 + (k % cols) * 34;
               const cy = base - b.h + 26 + Math.floor(k / cols) * 42;
-              return <rect key={k} x={cx} y={cy} width={18} height={24} rx={2} fill={lit ? "oklch(0.86 0.13 80)" : "oklch(0.27 0.05 286)"} opacity={lit ? 0.9 : 1} className={lit && rand() > 0.7 ? "anim-bulb" : undefined} style={lit ? { animationDelay: `${r1(rand() * 3)}s` } : undefined} />;
+              return <rect key={k} x={cx} y={cy} width={18} height={24} rx={2} fill={lit ? "oklch(0.80 0.13 205)" : "oklch(0.27 0.05 286)"} opacity={lit ? 0.9 : 1} className={lit && rand() > 0.7 ? "anim-bulb" : undefined} style={lit ? { animationDelay: `${r1(rand() * 3)}s` } : undefined} />;
             })}
           </g>
         );
@@ -98,7 +98,7 @@ export function NearBuildings({ seed = 5 }: { seed?: number }) {
   );
 }
 
-const BULB_COLORS = ["oklch(0.86 0.15 80)", "oklch(0.75 0.18 40)", "oklch(0.72 0.18 350)", "oklch(0.8 0.12 160)", "oklch(0.75 0.14 285)"];
+const BULB_COLORS = ["oklch(0.80 0.14 205)", "oklch(0.72 0.18 290)", "oklch(0.72 0.18 350)", "oklch(0.8 0.12 160)", "oklch(0.75 0.14 285)"];
 
 function strand(y0: number, y1: number, sag: number, n: number, seed: number) {
   const rand = rng(seed);
@@ -147,10 +147,10 @@ function Booth({ x, color, stripe, top = 640 }: { x: number; color: string; stri
       <path d={`M${x - 14} ${top + 60} L${x + 20} ${top} L${x + w - 20} ${top} L${x + w + 14} ${top + 60} Z`} fill={color} />
       {Array.from({ length: 5 }, (_, i) => <path key={i} d={`M${x + 20 + i * 60 + 12} ${top} L${x + 20 + i * 60 + 36} ${top} L${x + i * 66 + 34} ${top + 60} L${x + i * 66 + 4} ${top + 60} Z`} fill={stripe} opacity={0.55} />)}
       {Array.from({ length: 6 }, (_, i) => <circle key={i} cx={x - 14 + (i + 0.5) * ((w + 28) / 6)} cy={top + 60} r={(w + 28) / 12} fill={color} />)}
-      <rect x={x - 6} y={deck} width={w + 12} height={18} rx={4} fill="oklch(0.16 0.03 284)" />
+      <rect x={x - 6} y={deck} width={w + 12} height={18} rx={4} fill="oklch(0.12 0.018 265)" />
       <rect x={x + 4} y={deck + 18} width={w - 8} height={H - deck} fill="oklch(0.13 0.025 284)" />
       <rect x={x + 30} y={deck - 34} width={54} height={34} rx={3} fill={color} opacity={0.85} />
-      <rect x={x + 100} y={deck - 22} width={40} height={22} rx={3} fill="oklch(0.86 0.13 80)" opacity={0.9} />
+      <rect x={x + 100} y={deck - 22} width={40} height={22} rx={3} fill="oklch(0.80 0.13 205)" opacity={0.9} />
       <rect x={x + 200} y={deck - 46} width={30} height={46} rx={3} fill={stripe} opacity={0.9} />
     </g>
   );
@@ -161,9 +161,9 @@ export function Booths() {
   return (
     <svg aria-hidden="true" className="absolute inset-0 h-full w-full" viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="xMidYMax slice">
       <rect x={0} y={H - 60} width={W} height={60} fill="oklch(0.12 0.02 284)" />
-      <Booth x={110} color="oklch(0.66 0.19 37)" stripe="oklch(0.95 0.03 80)" />
+      <Booth x={110} color="oklch(0.64 0.13 215)" stripe="oklch(0.85 0.07 210)" />
       <Booth x={650} top={700} color="oklch(0.55 0.19 285)" stripe="oklch(0.92 0.04 290)" />
-      <Booth x={1190} color="oklch(0.6 0.19 4)" stripe="oklch(0.95 0.03 350)" />
+      <Booth x={1190} color="oklch(0.60 0.17 300)" stripe="oklch(0.85 0.07 295)" />
       {[[70, 120], [450, 150], [520, 128], [600, 110], [1000, 140], [1090, 118], [1530, 150], [1470, 110]].map(([x, h], i) => <Person key={i} x={x!} h={h!} tone={tone} />)}
     </svg>
   );

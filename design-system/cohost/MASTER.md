@@ -1,3 +1,7 @@
+# CoHost — Neon Campus
+
+User-directed visual update: graphite and near-black surfaces, electric cyan actions, violet collaboration accents, luminous campus scenery. All screens use the shared dark semantic tokens in src/styles.css. Maintain readable contrast, reduced-motion support, responsive layouts, and existing auth and database behavior.
+
 # CoHost design system — "Campus after dark"
 
 Source of truth for the CoHost UI. Page files in `pages/` override this file where they differ.

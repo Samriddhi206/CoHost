@@ -4,7 +4,7 @@ import { Brand } from "@/components/Brand";
 import { Booths, FarSkyline, NearBuildings, Sky, Stars, StringLights } from "@/components/landing/scenery";
 
 // Split layout for sign-in, reset and email-confirmation pages: the night-campus scene on the left
-// (decorative, hidden on small screens), the form on warm paper on the right.
+// (decorative, hidden on small screens), the form in a graphite workspace on the right.
 export function AuthShell({ children, title, lede }: { children: ReactNode; title: string; lede?: string }) {
   return (
     <div className="grid min-h-[100svh] bg-background lg:grid-cols-[1.05fr_1fr]">
@@ -31,7 +31,7 @@ export function AuthShell({ children, title, lede }: { children: ReactNode; titl
           {lede && <p className="mt-3 text-muted-foreground">{lede}</p>}
           <div className="mt-8">{children}</div>
         </div>
-        <p className="mx-auto w-full max-w-md text-xs text-muted-foreground">Your identity comes from Supabase Auth. Permissions are checked in the database, not the browser.</p>
+        <p className="mx-auto w-full max-w-md text-xs text-muted-foreground">Your club. Your decisions. Every commitment stays in your control.</p>
       </main>
     </div>
   );
