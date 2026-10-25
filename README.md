@@ -12,9 +12,9 @@ CoHost helps campus organizations plan shared events, coordinate resources, and 
 
 Built for the [Cubbie Hackathon](https://hackathon.cubbie.ai), Track 3 (Group Chat Assistant).
 
-## Track 3 at a glance
+## Track 2 at a glance
 
-| Track 3 asks | CoHost |
+| Track 2 asks | CoHost |
 | --- | --- |
 | An AI that joins a group and makes it more useful | Each club brings an agent into a shared event workspace with its partner clubs. The agents turn each club's private limits into one plan, and the officers of every club in the event can read each message they exchange. CoHost is a web app, not a plug-in for a messaging app |
 | Something students would want to invite in | Officers type their limits once in a private brief; the agent drafts the plan, catches conflicts and explains what changed. Members never sit through the back-and-forth: they just pick a shift |
