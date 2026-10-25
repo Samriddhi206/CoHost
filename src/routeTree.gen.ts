@@ -14,6 +14,7 @@ import { Route as AppRouteImport } from './routes/app'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as DemoRouteImport } from './routes/demo'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as AuthCallbackRouteImport } from './routes/auth_.callback'
 import { Route as DemoIndexRouteImport } from './routes/demo.index'
 import { Route as DemoApprovalsRouteImport } from './routes/demo.approvals'
 import { Route as DemoBriefRouteImport } from './routes/demo.brief'
@@ -44,6 +45,11 @@ const DemoRoute = DemoRouteImport.update({
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
   id: '/reset-password',
   path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthCallbackRoute = AuthCallbackRouteImport.update({
+  id: '/auth_/callback',
+  path: '/auth/callback',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DemoIndexRoute = DemoIndexRouteImport.update({
@@ -83,6 +89,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/demo': typeof DemoRouteWithChildren
   '/reset-password': typeof ResetPasswordRoute
+  '/auth/callback': typeof AuthCallbackRoute
   '/demo/approvals': typeof DemoApprovalsRoute
   '/demo/brief': typeof DemoBriefRoute
   '/demo/crew': typeof DemoCrewRoute
@@ -95,6 +102,7 @@ export interface FileRoutesByTo {
   '/app': typeof AppRoute
   '/auth': typeof AuthRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/auth/callback': typeof AuthCallbackRoute
   '/demo/approvals': typeof DemoApprovalsRoute
   '/demo/brief': typeof DemoBriefRoute
   '/demo/crew': typeof DemoCrewRoute
@@ -109,6 +117,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/demo': typeof DemoRouteWithChildren
   '/reset-password': typeof ResetPasswordRoute
+  '/auth_/callback': typeof AuthCallbackRoute
   '/demo/approvals': typeof DemoApprovalsRoute
   '/demo/brief': typeof DemoBriefRoute
   '/demo/crew': typeof DemoCrewRoute
@@ -124,6 +133,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/demo'
     | '/reset-password'
+    | '/auth/callback'
     | '/demo/approvals'
     | '/demo/brief'
     | '/demo/crew'
@@ -136,6 +146,7 @@ export interface FileRouteTypes {
     | '/app'
     | '/auth'
     | '/reset-password'
+    | '/auth/callback'
     | '/demo/approvals'
     | '/demo/brief'
     | '/demo/crew'
@@ -149,6 +160,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/demo'
     | '/reset-password'
+    | '/auth_/callback'
     | '/demo/approvals'
     | '/demo/brief'
     | '/demo/crew'
@@ -163,6 +175,7 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   DemoRoute: typeof DemoRouteWithChildren
   ResetPasswordRoute: typeof ResetPasswordRoute
+  AuthCallbackRoute: typeof AuthCallbackRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -200,6 +213,13 @@ declare module '@tanstack/react-router' {
       path: '/reset-password'
       fullPath: '/reset-password'
       preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth_/callback': {
+      id: '/auth_/callback'
+      path: '/auth/callback'
+      fullPath: '/auth/callback'
+      preLoaderRoute: typeof AuthCallbackRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/demo/': {
@@ -273,6 +293,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   DemoRoute: DemoRouteWithChildren,
   ResetPasswordRoute: ResetPasswordRoute,
+  AuthCallbackRoute: AuthCallbackRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

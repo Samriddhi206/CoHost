@@ -10,6 +10,6 @@ let client: SupabaseClient | null = null;
 /** Returns null when unconfigured — callers must fail closed. */
 export function getSupabase(): SupabaseClient | null {
   if (!supabaseConfigured || typeof window === "undefined") return null;
-  client ??= createClient(url!, key!, { auth: { persistSession: true, autoRefreshToken: true } });
+  client ??= createClient(url!, key!, { auth: { persistSession: true, autoRefreshToken: true, flowType: "pkce", detectSessionInUrl: false } });
   return client;
 }
