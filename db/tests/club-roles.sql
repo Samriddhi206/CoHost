@@ -62,5 +62,12 @@ insert into auth.users values ('a0000000-0000-0000-0000-000000000005', 'legacy@e
 insert into club_members(club_id, user_id, role) values ((select id from club), 'a0000000-0000-0000-0000-000000000005', 'leader');
 select pg_temp.check((select title from club_members where user_id = 'a0000000-0000-0000-0000-000000000005') = 'President', 'older leader-only inserts get a title');
 
+reset role;
+insert into auth.users values ('a0000000-0000-0000-0000-000000000006', 'joiner@example.invalid');
+select pg_temp.as_user('a0000000-0000-0000-0000-000000000006'); set local role authenticated;
+select public.request_membership_as((select id from club), 'Member');
+select pg_temp.check((select title from club_members where user_id = auth.uid()) = 'Member', 'joining as Member is instant');
+reset role;
+
 select n, case when ok then 'ok  ' else 'FAIL' end, what from r order by n;
 rollback;

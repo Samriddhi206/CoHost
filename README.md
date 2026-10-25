@@ -35,7 +35,7 @@ Supabase Auth + Postgres RLS. Browser tables are SELECT-only; writes use authent
 
 SQL replay order on an EMPTY project: `db/migrations/20261025000000_cohost_init.sql`, `db/hardening.sql`, `db/workflows.sql`, `db/private-api.sql`. These changes are already applied on CoHost. Do not re-run against an initialized project.
 
-Then apply `db/migrations/20261025060000_club_roles.sql` once. It adds club roles (President, Vice President, Budget officer, Event coordinator, Member; anyone above Member is an officer), display names, event time and place, joining a club with a requested role that an officer confirms, and hides the plan, agent messages and approvals from plain members. `db/tests/club-roles.sql` checks those rules and rolls everything back.
+Then apply `db/migrations/20261025060000_club_roles.sql` once. It adds club roles (President, Vice President, Budget officer, Event coordinator, Member; anyone above Member is an officer), display names, event time and place, joining a club with a requested role that an officer confirms, and hides the plan, agent messages and approvals from plain members. Then `db/migrations/20261025070000_instant_join.sql`, which lets people join a club as a Member instantly (officer roles still need an officer). `db/tests/club-roles.sql` checks those rules and rolls everything back.
 
 ## Verification
 
