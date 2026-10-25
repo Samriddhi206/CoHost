@@ -1,4 +1,4 @@
-import { createFileRoute, Link, Outlet } from "@tanstack/react-router";
+import { createFileRoute, Link, Outlet, useLocation } from "@tanstack/react-router";
 import { LayoutDashboard, MessagesSquare, CheckCircle2, Users, Lock, Settings2 } from "lucide-react";
 import { Brand } from "@/components/Brand";
 import { DemoProvider, useDemo } from "@/lib/demo-store";
@@ -21,12 +21,13 @@ function DemoLayout() {
 
 function Shell() {
   const { s, setUser, error, clear, reset } = useDemo();
+  const { pathname } = useLocation();
   return (
     <div className="min-h-screen md:flex">
       <aside className="hidden w-64 shrink-0 flex-col gap-1 border-r border-sidebar-border bg-sidebar p-5 md:flex">
-        <Link to="/" className="mb-8"><Brand small /></Link>
+        <Link to="/" className="mb-8 rounded-full"><Brand small tone="light" /></Link>
         {NAV.map((n) => (
-          <Link key={n.to} to={n.to} activeOptions={{ exact: true }} className="flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-sidebar-accent" activeProps={{ className: "bg-sidebar-accent text-sidebar-accent-foreground" }}>
+          <Link key={n.to} to={n.to} activeOptions={{ exact: true }} className="flex min-h-11 items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium text-white/65 transition-colors duration-200 hover:bg-white/10 hover:text-white" activeProps={{ className: "!bg-primary !text-primary-foreground shadow-[0_8px_20px_-10px_var(--color-primary)]" }}>
             <n.icon className="h-4 w-4" />{n.label}
           </Link>
         ))}
@@ -48,11 +49,11 @@ function Shell() {
             {error}<button onClick={clear} className="font-semibold">Dismiss</button>
           </div>
         )}
-        <main className="mx-auto max-w-5xl p-5 md:p-10"><Outlet /></main>
+        <main key={pathname} className="anim-rise mx-auto max-w-5xl p-5 md:p-10" style={{ animationDuration: ".32s" }}><Outlet /></main>
       </div>
       <nav className="fixed inset-x-0 bottom-0 z-10 grid grid-cols-6 border-t border-border bg-card md:hidden">
         {NAV.map((n) => (
-          <Link key={n.to} to={n.to} activeOptions={{ exact: true }} className="flex flex-col items-center gap-1 py-2 text-[11px] text-muted-foreground" activeProps={{ className: "text-primary" }}>
+          <Link key={n.to} to={n.to} activeOptions={{ exact: true }} className="flex min-h-14 flex-col items-center justify-center gap-1 py-2 text-[11px] text-muted-foreground transition-colors" activeProps={{ className: "!text-primary font-semibold" }}>
             <n.icon className="h-5 w-5" />{n.label}
           </Link>
         ))}
